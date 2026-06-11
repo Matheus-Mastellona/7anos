@@ -48,6 +48,39 @@ document.addEventListener('DOMContentLoaded', function() {
     backgroundMusic.addEventListener('play', function() {
         console.log('Música iniciada ❤️');
     });
+
+    // Função para ampliar a imagem ao clicar
+    const mainImage = document.getElementById('mainImage');
+    const imageModal = document.getElementById('imageModal');
+    const closeModal = document.getElementById('closeModal');
+
+    // Abrir modal ao clicar na imagem
+    mainImage.addEventListener('click', function() {
+        imageModal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Bloqueia scroll
+    });
+
+    // Fechar modal ao clicar no X
+    closeModal.addEventListener('click', function() {
+        imageModal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Libera scroll
+    });
+
+    // Fechar modal ao clicar fora da imagem
+    imageModal.addEventListener('click', function(e) {
+        if (e.target === imageModal) {
+            imageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && imageModal.style.display === 'block') {
+            imageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
 });
 
 // Adiciona animação CSS de pulso para o botão (via JavaScript)
