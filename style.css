@@ -160,7 +160,7 @@ body {
 /* Celular */
 @media (max-width: 480px) {
     .numero {
-        top: 3;
+        top: 8;
     }
 }
 
