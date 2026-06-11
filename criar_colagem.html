@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Colagem 07</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #ffd4e5;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        
+        #controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        button {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        button:hover {
+            background: #ff8fab;
+        }
+        
+        #canvas {
+            border: 3px solid #ff6b9d;
+            border-radius: 10px;
+            background: white;
+            max-width: 100%;
+        }
+        
+        #info {
+            margin: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Criador de Colagem "07" ❤️</h1>
+    
+    <div id="controls">
+        <div id="info">Selecione suas fotos da pasta "images"</div>
+        <input type="file" id="fileInput" multiple accept="image/*" style="display:none;">
+        <button onclick="document.getElementById('fileInput').click()">📁 Selecionar Fotos</button>
+        <button id="criarBtn" onclick="criarColagem()" style="display:none;">✨ Criar Colagem</button>
+        <button id="baixarBtn" onclick="baixarImagem()" style="display:none;">💾 Baixar 7anos.jpg</button>
+    </div>
+    
+    <br>
+    <canvas id="canvas" width="2000" height="2000"></canvas>
+
+    <script>
+        // Usuário vai selecionar as fotos manualmente
+        let imagensCarregadas = [];
+
+        // 0 deslocado um pouco para a direita
+        const posicoes0 = [
+            [500, 500], [620, 500], [740, 500],
+
+            [500, 650], [740, 650],
+            [500, 800], [740, 800],
+            [500, 950], [740, 950],
+            [500, 1100], [740, 1100],
+            [500, 1250], [740, 1250],
+
+            [500, 1400], [620, 1400], [740, 1400]
+        ];
+
+        // 7 deslocado um pouco para a esquerda
+        const posicoes7 = [
+            [950, 500], [1070, 500], [1190, 500], [1310, 500], [1430, 500],
+
+            [1370, 650],
+            [1320, 800],
+            [1270, 950],
+            [1220, 1100],
+            [1170, 1250],
+            [1120, 1400]
+        ];
+
+        const todasPosicoes = [...posicoes0, ...posicoes7];
+
+        // Quando usuário selecionar as fotos
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const info = document.getElementById('info');
+            
+            if (files.length === 0) {
+                info.textContent = 'Nenhuma foto selecionada';
+                return;
+            }
+            
+            info.textContent = `Carregando ${files.length} fotos...`;
+            imagensCarregadas = [];
+            
+            let loaded = 0;
+            for (let i = 0; i < Math.min(files.length, todasPosicoes.length); i++) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        imagensCarregadas.push(img);
+                        loaded++;
+                        info.textContent = `Carregando fotos... ${loaded}/${Math.min(files.length, todasPosicoes.length)}`;
+                        
+                        if (loaded >= Math.min(files.length, todasPosicoes.length)) {
+                            info.textContent = `✅ ${imagensCarregadas.length} fotos carregadas! Clique em "Criar Colagem"`;
+                            document.getElementById('criarBtn').style.display = 'inline-block';
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        });
+
+        async function criarColagem() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const info = document.getElementById('info');
+            
+            info.textContent = '🎨 Criando sua colagem...';
+            
+            // Fundo rosa
+            ctx.fillStyle = '#ffe4f1';
+            ctx.fillRect(0, 0, 2000, 2000);
+            
+            // Título - ajustado para caber
+            ctx.fillStyle = '#ff6b9d';
+            ctx.font = 'bold 72px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❤️ 7 Anos de Amor ❤️', canvas.width / 2, 250);
+            
+            // Tamanho das fotos
+            const tamanho = 110;
+            
+            // Desenhar cada foto nas posições
+            for (let i = 0; i < todasPosicoes.length && i < imagensCarregadas.length; i++) {
+                const [x, y] = todasPosicoes[i];
+                const img = imagensCarregadas[i];
+                
+                // Calcular proporção para preencher o quadrado
+                const scale = Math.max(tamanho / img.width, tamanho / img.height);
+                const w = img.width * scale;
+                const h = img.height * scale;
+                const offsetX = (tamanho - w) / 2;
+                const offsetY = (tamanho - h) / 2;
+                
+                // Salvar contexto
+                ctx.save();
+                
+                // Criar retângulo de recorte
+                ctx.beginPath();
+                ctx.rect(x, y, tamanho, tamanho);
+                ctx.clip();
+                
+                // Desenhar imagem
+                ctx.drawImage(img, x + offsetX, y + offsetY, w, h);
+                
+                // Restaurar contexto
+                ctx.restore();
+                
+                // Borda branca
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x, y, tamanho, tamanho);
+            }
+            
+            // Coração no rodapé
+            ctx.font = 'bold 100px Arial';
+            ctx.fillText('❤️', canvas.width / 2, 1850) ;
+            
+            info.textContent = '✅ Colagem criada! Clique em "Baixar" para salvar';
+            document.getElementById('baixarBtn').style.display = 'inline-block';
+        }
+
+        function baixarImagem() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.download = '7anos.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+            
+            document.getElementById('info').textContent = '✅ Download iniciado! Coloque o arquivo na pasta raiz';
+        }
+    </script>
+</body>
+</html>
